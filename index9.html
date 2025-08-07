@@ -1,69 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <title>تأكيد كود الحجز</title>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تأكيد كود الحجز - MLAAB CITY</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    input {
+      padding: 12px;
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #4caf50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <h2>تأكيد كود الحجز</h2>
-  <input type="text" id="codeInput" placeholder="ادخل كود الحجز">
-  <button onclick="checkCode()">تحقق</button>
-
-  <div id="result"></div>
+  <div class="container">
+    <h2>تأكيد كود الحجز</h2>
+    <input type="text" id="codeInput" placeholder="ادخل كود الحجز">
+    <button id="verifyBtn">تأكيد</button>
+    <p id="message"></p>
+  </div>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyChXYUhXG3GliFPb5vp736Hhp7Msllxj68",
-    authDomain: "mlaab-city.firebaseapp.com",
-    projectId: "mlaab-city",
-    storageBucket: "mlaab-city.firebasestorage.app",
-    messagingSenderId: "910383180422",
-    appId: "1:910383180422:web:3feb8fad61d2cab5917f07",
-    measurementId: "G-YQ0016JLVH"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyChXYUhXG3GliFPb5vp736Hhp7Msllxj68",
+      authDomain: "mlaab-city.firebaseapp.com",
+      projectId: "mlaab-city",
+      storageBucket: "mlaab-city.firebasestorage.app",
+      messagingSenderId: "910383180422",
+      appId: "1:910383180422:web:3feb8fad61d2cab5917f07",
+      measurementId: "G-YQ0016JLVH"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app); // قاعدة البيانات
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    async function checkCode() {
-      const code = document.getElementById("codeInput").value;
-      const q = query(collection(db, "bookings"), where("code", "==", code));
-      const querySnapshot = await getDocs(q);
+    document.getElementById("verifyBtn").addEventListener("click", async () => {
+      const code = document.getElementById("codeInput").value.trim();
+      const msg = document.getElementById("message");
 
-      if (querySnapshot.empty) {
-        document.getElementById("result").innerText = "الكود غير موجود.";
+      if (!code) {
+        msg.textContent = "الرجاء إدخال الكود";
+        msg.className = "error";
         return;
       }
 
-      querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        if (data.expired) {
-          document.getElementById("result").innerText = "❌ هذا الكود غير صالح (تم استخدامه).";
-        } else {
-          document.getElementById("result").innerHTML = `
-            ✅ الاسم: ${data.name}<br>
-            📞 الهاتف: ${data.phone}<br>
-            📅 التاريخ: ${data.date}<br>
-            🕒 الوقت: ${data.from}-${data.to} ${data.am_pm}<br>
-            <button onclick="expireCode('${docSnap.id}')">تم استخدام الكود</button>
-          `;
-        }
-      });
-    }
+      const q = query(collection(db, "bookings"), where("code", "==", code));
+      const snapshot = await getDocs(q);
 
-    async function expireCode(docId) {
-      const bookingRef = doc(db, "bookings", docId);
-      await updateDoc(bookingRef, { expired: true });
-      alert("✅ تم إنهاء صلاحية الكود.");
-      document.getElementById("result").innerText = "❌ الكود الآن غير صالح.";
-    }
+      if (snapshot.empty) {
+        msg.textContent = "لم يتم العثور على الكود.";
+        msg.className = "error";
+        return;
+      }
+
+      const bookingDoc = snapshot.docs[0];
+      const ref = doc(db, "bookings", bookingDoc.id);
+
+      await updateDoc(ref, {
+        expired: true
+      });
+
+      msg.textContent = "تم تأكيد الكود وتم اعتباره مستهلك.";
+      msg.className = "success";
+    });
   </script>
 </body>
 </html>

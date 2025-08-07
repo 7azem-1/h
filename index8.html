@@ -1,103 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <title>حجز ملعب</title>
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js"></script>
-  <!-- EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حجز ملعب - MLAAB CITY</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .time-row {
+      display: flex;
+      gap: 10px;
+    }
+    .time-row select {
+      flex: 1;
+    }
+    button {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #27ae60;
+    }
+  </style>
 </head>
 <body>
-  <h2>حجز ملعب</h2>
-  <form id="bookingForm">
-    <!-- بيانات العميل -->
-    <input type="text" id="name" placeholder="الاسم" required><br>
-    <input type="email" id="email" placeholder="البريد الإلكتروني" required><br>
-    <input type="text" id="phone" placeholder="رقم الهاتف" required><br>
+  <div class="form-container">
+    <h2>احجز ملعبك الآن</h2>
+    <form id="bookingForm">
+      <div class="form-group">
+        <label for="name">الاسم</label>
+        <input type="text" id="name" required />
+      </div>
 
-    <!-- اختيار اليوم -->
-    <label>اختيار اليوم:</label>
-    <input type="date" id="date" required><br>
+      <div class="form-group">
+        <label for="email">البريد الإلكتروني</label>
+        <input type="email" id="email" required />
+      </div>
 
-    <!-- اختيار الساعات -->
-    <label>من الساعة:</label>
-    <select id="from" required>
-      <option value="7">7</option>
-      <option value="8">8</option>
-    </select>
+      <div class="form-group">
+        <label for="phone">رقم الهاتف</label>
+        <input type="tel" id="phone" required />
+      </div>
 
-    <label>إلى الساعة:</label>
-    <select id="to" required>
-      <option value="8">8</option>
-      <option value="9">9</option>
-    </select>
+      <div class="form-group">
+        <label for="day">اليوم</label>
+        <select id="day" required>
+          <option value="">اختر اليوم</option>
+          <option value="السبت">السبت</option>
+          <option value="الأحد">الأحد</option>
+          <option value="الإثنين">الإثنين</option>
+          <option value="الثلاثاء">الثلاثاء</option>
+          <option value="الأربعاء">الأربعاء</option>
+          <option value="الخميس">الخميس</option>
+          <option value="الجمعة">الجمعة</option>
+        </select>
+      </div>
 
-    <!-- AM / PM -->
-    <label>AM / PM:</label>
-    <select id="am_pm">
-      <option value="AM">AM</option>
-      <option value="PM">PM</option>
-    </select><br>
+      <div class="form-group">
+        <label>اختيار الوقت</label>
+        <div class="time-row">
+          <select id="from" required>
+            <option value="">من</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+          </select>
+          <select id="to" required>
+            <option value="">إلى</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+            <option value="11">11</option>
+            <option value="12">12</option>
+            <option value="13">1</option>
+          </select>
+          <select id="am_pm" required>
+            <option value="AM">صباحًا</option>
+            <option value="PM">مساءً</option>
+          </select>
+        </div>
+      </div>
 
-    <button type="submit">احجز الآن</button>
-  </form>
+      <button type="submit">احجز الآن</button>
+    </form>
+  </div>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyChXYUhXG3GliFPb5vp736Hhp7Msllxj68",
-    authDomain: "mlaab-city.firebaseapp.com",
-    projectId: "mlaab-city",
-    storageBucket: "mlaab-city.firebasestorage.app",
-    messagingSenderId: "910383180422",
-    appId: "1:910383180422:web:3feb8fad61d2cab5917f07",
-    measurementId: "G-YQ0016JLVH"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyChXYUhXG3GliFPb5vp736Hhp7Msllxj68",
+      authDomain: "mlaab-city.firebaseapp.com",
+      projectId: "mlaab-city",
+      storageBucket: "mlaab-city.firebasestorage.app",
+      messagingSenderId: "910383180422",
+      appId: "1:910383180422:web:3feb8fad61d2cab5917f07",
+      measurementId: "G-YQ0016JLVH"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app); // قاعدة البيانات
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    emailjs.init("TX8-siv12PBErzriy");
+    function generateCode(length = 6) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
 
-    document.getElementById("bookingForm").addEventListener("submit", async function(e) {
+    function validateHours(from, to) {
+      return parseInt(to) - parseInt(from) === 1;
+    }
+
+    document.getElementById("bookingForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // جلب البيانات
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const phone = document.getElementById("phone").value;
-      const date = document.getElementById("date").value;
-      const from = parseInt(document.getElementById("from").value);
-      const to = parseInt(document.getElementById("to").value);
+      const day = document.getElementById("day").value;
+      const from = document.getElementById("from").value;
+      const to = document.getElementById("to").value;
       const am_pm = document.getElementById("am_pm").value;
 
-      if ((to - from) !== 1) {
-        alert("مدة الحجز يجب أن تكون ساعة واحدة فقط!");
+      if (!validateHours(from, to)) {
+        alert("مدة الحجز يجب أن تكون ساعة واحدة فقط.");
         return;
       }
 
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      const created_at = new Date().toISOString();
+      const code = generateCode();
 
-      const data = { name, email, phone, date, from, to, am_pm, code, created_at, expired: false };
+      try {
+        await addDoc(collection(db, "bookings"), {
+          name,
+          email,
+          phone,
+          day,
+          from,
+          to,
+          am_pm,
+          code,
+          expired: false,
+          createdAt: serverTimestamp()
+        });
 
-      await addDoc(collection(db, "bookings"), data);
+        alert(`تم الحجز بنجاح!\nالكود الخاص بك لدخول الحجز هو: ${code}`);
 
-      // إرسال الكود عبر الإيميل
-      emailjs.send("service_d75wk4a", "template_fo5wwpn", {
-        to_email: email,
-        name: name,
-        code: code,
-      }).then(() => {
-        alert("تم الحجز! تم إرسال كود إلى البريد.");
-      }, (err) => {
-        alert("فشل إرسال الإيميل: " + err);
-      });
+        // هنا تقدر تضيف كود EmailJS لو حبيت ترسل الكود بالإيميل
+      } catch (err) {
+        console.error("خطأ في الحجز:", err);
+        alert("حدث خطأ أثناء الحجز. حاول مرة أخرى.");
+      }
     });
   </script>
 </body>
